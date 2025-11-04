@@ -4,6 +4,11 @@
 
 ijkplayer 的视频解码模块负责将压缩的视频数据包解码为原始视频帧，供后续渲染使用。该模块支持多种视频格式，包括 H.264、H.265 等，并提供了硬件解码功能（如 Android MediaCodec）。
 
+核心实现位于：
+- `A4ijkplayer/src/main/cpp/ijkmedia/ijkplayer/ff_ffplay.c` - 视频解码主流程
+- `A4ijkplayer/src/main/cpp/ijkmedia/ijkplayer/android/pipeline/ffpipenode_android_mediacodec_vdec.c` - MediaCodec 硬件解码
+- FFmpeg 的 libavcodec 库 - 底层软件解码器
+
 ## 2. 核心组件
 
 ### 2.1 解码器结构
@@ -81,26 +86,25 @@ ijkplayer 支持在硬件解码和软件解码之间动态切换：
 
 ### 5.1 解码器初始化
 
-1. `stream_component_open` (ff_ffplay.c) - 打开流组件
-2. `avcodec_find_decoder` - 查找解码器
-3. `avcodec_alloc_context3` - 分配解码器上下文
-4. `avcodec_parameters_to_context` - 复制参数
-5. `avcodec_open2` - 打开解码器
+1. `stream_component_open` (A4ijkplayer/src/main/cpp/ijkmedia/ijkplayer/ff_ffplay.c) - 打开流组件
+2. `avcodec_find_decoder` (FFmpeg) - 查找解码器
+3. `avcodec_alloc_context3` (FFmpeg) - 分配解码器上下文
+4. `avcodec_parameters_to_context` (FFmpeg) - 复制参数
+5. `avcodec_open2` (FFmpeg) - 打开解码器
 
 ### 5.2 视频解码循环
 
-1. `video_refresh` (ff_ffplay.c) - 视频刷新函数
+1. `video_refresh` (A4ijkplayer/src/main/cpp/ijkmedia/ijkplayer/ff_ffplay.c) - 视频刷新函数
 2. `decoder_decode_frame` (ff_ffplay.c) - 解码器解码函数
-3. `avcodec_send_packet` - 发送数据包
-4. `avcodec_receive_frame` - 接收解码帧
+3. `avcodec_send_packet` (FFmpeg) - 发送数据包
+4. `avcodec_receive_frame` (FFmpeg) - 接收解码帧
 
 ### 5.3 硬件解码调用链
 
-1. `ffpipeline_open_video_decoder` (ffpipeline_android.c) - 打开视频解码器
-2. `ffpipenode_create_video_decoder_from_android_mediacodec` - 创建 MediaCodec 解码节点
-3. `SDL_AMediaCodecJava_createByCodecName` - 创建 MediaCodec 实例
-4. `SDL_AMediaCodecQueueInputBuffer` - 输入数据到 MediaCodec
-5. `SDL_AMediaCodec_dequeueOutputBuffer` - 从 MediaCodec 获取解码输出
+1. `ffpipeline_open_video_decoder` (A4ijkplayer/src/main/cpp/ijkmedia/ijkplayer/android/pipeline/ffpipeline_android.c) - 打开视频解码器
+2. `ffpipenode_create_video_decoder_from_android_mediacodec` (ffpipenode_android_mediacodec_vdec.c) - 创建 MediaCodec 解码节点
+3. `SDL_AMediaCodecJava_createByCodecName` (A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/android/ijksdl_codec_android_mediacodec_java.c) - 创建 MediaCodec 实例
+4. MediaCodec JNI 调用 - 通过 JNI 调用 Android MediaCodec API
 
 ## 6. 特殊处理
 

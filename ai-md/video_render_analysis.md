@@ -4,6 +4,12 @@
 
 ijkplayer 的视频渲染模块负责将解码后的视频帧显示到 Android 设备的屏幕上。该模块支持多种渲染方式，包括基于 ANativeWindow 的直接渲染和基于 OpenGL ES 的渲染，并且能够与 Android MediaCodec 硬件解码器无缝集成。
 
+核心实现位于：
+- `A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/android/ijksdl_vout_android_nativewindow.c` - ANativeWindow 渲染实现
+- `A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/ijksdl_egl.c` - EGL 封装
+- `A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/gles2/` - OpenGL ES 2.0 渲染器
+- `A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/ijksdl_vout.c` - 视频输出抽象层
+
 ## 2. 核心组件
 
 ### 2.1 SDL_Vout 抽象层
@@ -127,25 +133,25 @@ typedef struct SDL_VoutOverlay {
 
 ### 7.1 视频输出初始化
 
-1. `stream_open` (ff_ffplay.c) - 打开流
-2. `SDL_VoutAndroid_CreateForANativeWindow` (ijksdl_vout_android_nativewindow.c) - 创建视频输出对象
-3. `SDL_VoutAndroid_SetNativeWindow` - 设置 ANativeWindow
+1. `stream_open` (A4ijkplayer/src/main/cpp/ijkmedia/ijkplayer/ff_ffplay.c) - 打开流
+2. `SDL_VoutAndroid_CreateForANativeWindow` (A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/android/ijksdl_vout_android_nativewindow.c) - 创建视频输出对象
+3. `SDL_VoutAndroid_SetNativeWindow` (ijksdl_vout_android_nativewindow.c) - 设置 ANativeWindow
 
 ### 7.2 视频渲染循环
 
-1. `video_refresh` (ff_ffplay.c) - 视频刷新函数
-2. `SDL_VoutDisplayYUVOverlay` - 显示视频覆盖层
-3. `func_display_overlay` (ijksdl_vout_android_nativewindow.c) - 显示覆盖层实现
+1. `video_refresh` (A4ijkplayer/src/main/cpp/ijkmedia/ijkplayer/ff_ffplay.c) - 视频刷新函数
+2. `SDL_VoutDisplayYUVOverlay` (A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/ijksdl_vout.c) - 显示视频覆盖层
+3. `func_display_overlay` (A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/android/ijksdl_vout_android_nativewindow.c) - 显示覆盖层实现
 4. 根据帧格式选择渲染方式：
    - MediaCodec 帧：`SDL_VoutOverlayAMediaCodec_releaseFrame_l`
    - 其他帧：`IJK_EGL_display`
 
 ### 7.3 OpenGL ES 渲染
 
-1. `IJK_EGL_display` (ijksdl_egl.c) - EGL 显示函数
-2. `IJK_EGL_display_internal` - 内部显示实现
-3. `IJK_GLES2_Renderer_renderOverlay` - GLES2 渲染器渲染
-4. `eglSwapBuffers` - 交换缓冲区
+1. `IJK_EGL_display` (A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/ijksdl_egl.c) - EGL 显示函数
+2. `IJK_EGL_display_internal` (ijksdl_egl.c) - 内部显示实现
+3. `IJK_GLES2_Renderer_renderOverlay` (A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/gles2/renderer.c) - GLES2 渲染器渲染
+4. `eglSwapBuffers` (EGL) - 交换缓冲区
 
 ## 8. 特殊功能
 

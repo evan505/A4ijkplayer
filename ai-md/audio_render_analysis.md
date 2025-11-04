@@ -4,6 +4,11 @@
 
 ijkplayer 的音频硬件播放模块负责将解码后的 PCM 音频数据通过 Android 系统的音频接口播放出来。该模块支持 OpenSL ES 和 AudioTrack 两种音频输出方式，并提供了音量控制、播放速率调整等功能。
 
+核心实现位于：
+- `A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/android/ijksdl_aout_android_opensles.c` - OpenSL ES 实现
+- `A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/android/ijksdl_aout_android_audiotrack.c` - AudioTrack 实现
+- `A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/ijksdl_aout.c` - 音频输出抽象层
+
 ## 2. 核心组件
 
 ### 2.1 SDL_Aout 抽象层
@@ -101,17 +106,17 @@ typedef struct SDL_Aout {
 
 ### 6.1 音频输出初始化
 
-1. `stream_component_open` (ff_ffplay.c) - 打开流组件
-2. `ffpipeline_open_audio_output` (ffpipeline_android.c) - 打开音频输出
-3. `SDL_AoutAndroid_CreateForOpenSLES` 或 `SDL_AoutAndroid_CreateForAudioTrack` - 创建音频输出对象
-4. `SDL_AoutOpenAudio` - 打开音频输出
+1. `stream_component_open` (A4ijkplayer/src/main/cpp/ijkmedia/ijkplayer/ff_ffplay.c) - 打开流组件
+2. `ffpipeline_open_audio_output` (A4ijkplayer/src/main/cpp/ijkmedia/ijkplayer/android/pipeline/ffpipeline_android.c) - 打开音频输出
+3. `SDL_AoutAndroid_CreateForOpenSLES` (ijksdl_aout_android_opensles.c) 或 `SDL_AoutAndroid_CreateForAudioTrack` (ijksdl_aout_android_audiotrack.c) - 创建音频输出对象
+4. `SDL_AoutOpenAudio` (A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/ijksdl_aout.c) - 打开音频输出
 
 ### 6.2 音频播放循环
 
-1. `sdl_audio_callback` (ff_ffplay.c) - 音频回调函数
+1. `sdl_audio_callback` (A4ijkplayer/src/main/cpp/ijkmedia/ijkplayer/ff_ffplay.c) - 音频回调函数
 2. `audio_decode_frame` (ff_ffplay.c) - 解码音频帧
-3. `SDL_Android_AudioTrack_write` (ijksdl_aout_android_audiotrack.c) - 写入 AudioTrack
-4. 或 `slBufferQueueItf->Enqueue` (ijksdl_aout_android_opensles.c) - Enqueue 到 OpenSL ES
+3. `SDL_Android_AudioTrack_write` (A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/android/ijksdl_aout_android_audiotrack.c) - 写入 AudioTrack
+4. 或 `slBufferQueueItf->Enqueue` (A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/android/ijksdl_aout_android_opensles.c) - Enqueue 到 OpenSL ES
 
 ### 6.3 音频控制
 

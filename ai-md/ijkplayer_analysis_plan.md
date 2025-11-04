@@ -52,13 +52,16 @@
 3. **调试工具**: 使用 Android Studio 的调试功能，单步跟踪关键代码路径
 4. **文档编写**: 为每个模块编写详细的分析文档，包含代码片段和调用关系图
 
-## 时间安排
+## 核心代码文件位置
 
-- 第1-2天: 完成解协议和解封装模块分析
-- 第3-4天: 完成音频解码和视频解码模块分析
-- 第5天: 完成音视频同步模块分析
-- 第6天: 完成音频硬件播放模块分析
-- 第7天: 完成视频渲染模块分析
-- 第8天: 整理和总结所有分析文档
+以下是 ijkplayer 核心代码的主要文件路径（相对于项目根目录）：
 
-通过以上计划，我们将全面深入地理解 ijkplayer 的实现原理，并为后续的开发和优化工作提供参考。
+- `A4ijkplayer/src/main/cpp/ijkmedia/ijkplayer/`
+  - `ijkplayer.c` - 播放器主接口
+  - `ff_ffplay.c` - FFmpeg 播放核心逻辑
+  - `ff_ffpipeline.c` - 播放管道实现
+  - `ff_ffpipenode.c` - 管道节点实现
+- `A4ijkplayer/src/main/cpp/ijkmedia/ijksdl/` - SDL 封装层
+- `A4ijkplayer/src/main/cpp/ijkmedia/ijkplayer/android/` - Android 平台相关实现
+
+通过以上计划，可以全面深入地理解 ijkplayer 的实现原理，并为后续的开发和优化工作提供参考。
